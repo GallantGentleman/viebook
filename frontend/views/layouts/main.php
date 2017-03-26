@@ -1,16 +1,10 @@
 <?php
 
-/* @var $this \yii\web\View */
-/* @var $content string */
-
 use yii\helpers\Html;
-use yii\bootstrap\Nav;
-use yii\bootstrap\NavBar;
-use yii\widgets\Breadcrumbs;
 use frontend\assets\AppAsset;
-use common\widgets\Alert;
 
 AppAsset::register($this);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -20,61 +14,71 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
+
+	<link href="https://fonts.googleapis.com/css?family=Baloo+Bhaina|Roboto+Condensed" rel="stylesheet">
+
+	<?php $this->head() ?>
 </head>
 <body>
 <?php $this->beginBody() ?>
 
-<div class="wrap">
-    <?php
-    NavBar::begin([
-        'brandLabel' => 'My Company',
-        'brandUrl' => Yii::$app->homeUrl,
-        'options' => [
-            'class' => 'navbar-inverse navbar-fixed-top',
-        ],
-    ]);
-    $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
-        ['label' => 'About', 'url' => ['/site/about']],
-        ['label' => 'Contact', 'url' => ['/site/contact']],
-    ];
-    if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
-    } else {
-        $menuItems[] = '<li>'
-            . Html::beginForm(['/site/logout'], 'post')
-            . Html::submitButton(
-                'Logout (' . Yii::$app->user->identity->username . ')',
-                ['class' => 'btn btn-link logout']
-            )
-            . Html::endForm()
-            . '</li>';
-    }
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => $menuItems,
-    ]);
-    NavBar::end();
-    ?>
+<div class="test_header">
 
-    <div class="container">
-        <?= Breadcrumbs::widget([
-            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-        ]) ?>
-        <?= Alert::widget() ?>
-        <?= $content ?>
-    </div>
+	<div class="row">
+		<div class="col-md-4">
+			<div class="test_logo">
+				<a href="<?= Yii::$app->getHomeUrl(); ?>">
+					<img src="img/logo.png">
+				</a>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="test_search">
+				<form action="" method="GET">
+				
+					<div class="input-group">
+						<input type="text" class="form-control test_search_input" placeholder="Search for... Lolita ?" name="q">
+						
+						<span class="input-group-btn">
+							<button class="btn btn-default test_search_button" type="submit">
+								<span class="glyphicon glyphicon-search"></span>
+							</button>
+						</span>
+					</div>
+				
+				</form>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="test_profile">
+
+				<?php if (Yii::$app->user->getId()): ?>
+
+					<span class="glyphicon glyphicon-menu-hamburger test_hamb"></span>
+					<?= Html::a("<span class='glyphicon glyphicon-user test_user'>", ['/site/logout'], ['data-method' => 'post']) ?></span>
+				<?php else: ?>
+
+					<div style="margin-top: 15px;">
+						<?= Html::a("Sign up", ['site/signup']); ?>
+						/
+						<?= Html::a("Login", ['site/login']); ?>
+					</div>
+
+				<?php endif; ?>
+
+			</div>
+		</div>
+	</div>
+
 </div>
 
-<footer class="footer">
-    <div class="container">
-        <p class="pull-left">&copy; My Company <?= date('Y') ?></p>
+<div class="test_wrap">
+    <?= $content ?>
+</div>
 
-        <p class="pull-right"><?= Yii::powered() ?></p>
-    </div>
-</footer>
+<div id="footer">
+	Gurachek - Svernyuk
+</div>
 
 <?php $this->endBody() ?>
 </body>

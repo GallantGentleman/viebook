@@ -12,12 +12,22 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use frontend\models\Reviews;
+use frontend\models\Books;
 
 /**
  * Site controller
  */
 class SiteController extends Controller
 {
+
+    public function beforeAction($action)
+    {
+        parent::beforeAction($action);
+
+        return true;
+    }
+
     /**
      * @inheritdoc
      */
@@ -70,9 +80,80 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($q = null)
     {
-        return $this->render('index');
+        if (!empty($q) || $q !== null) {
+            return $this->runAction('search', ['q' => $q]);
+        }
+
+        $reviews = Reviews::find()->orderBy("rating DESC")->limit(3)->all();
+
+        $books = [];
+        $books_category = [];
+        $authors = [];
+
+        foreach ($reviews as $review) {
+            $books[] = $review->book;
+            $books_category[] = $review->book->category;
+            $authors[] = $review->author;
+        }
+
+        return $this->render('index', [
+            'reviews' => $reviews,
+            'books' => $books,
+            'books_category' => $books_category,
+            'authors' => $authors,
+        ]);
+    }
+
+    public function actionSearch($q = null)
+    {
+        if (empty($q) || $q == null) {
+            return $this->runAction('site/index');
+        }
+
+        $reviews = null;
+        $book = null;
+        $author = null;
+        $category = null;
+        $author_name = null;
+        $amount = 0;
+        $for_books = null;
+        $authors = null;
+
+        $q = trim($q);
+
+        $book = Books::findOne(['title' => $q]);
+
+        if ($book !== null) {
+
+            $reviews = Reviews::find()->where(['book_id' => $book->id])->orderBy("rating DESC")->all();
+
+            $author = $book->author;
+            $author_name = $author->name ." ". $author->second_name ." ". $author->surname;
+
+            $category = $book->category;
+        }
+
+        if ($reviews !== null) {
+            $amount = count($reviews);
+
+            foreach ($reviews as $review) {
+                $for_books[] = $review->book;
+                $authors[] = $review->author;
+            }
+        }
+
+        return $this->render('search', [
+            'reviews' => $reviews,
+            'book' => $book,
+            'author' => $author,
+            'author_name' => $author_name,
+            'amount' => $amount,
+            'category' => $category,
+            'for_books' => $for_books,
+            'authors' => $authors,
+        ]);
     }
 
     /**
@@ -210,4 +291,5 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
+
 }
